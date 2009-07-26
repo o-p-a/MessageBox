@@ -231,8 +231,7 @@ void parse_arg()
 
 	message_text = arg;
 	message_caption = "メッセージ";
-	message_type = MB_ICONINFORMATION | MB_TOPMOST;
-
+	message_type = MB_APPLMODAL | MB_ICONINFORMATION | MB_TOPMOST;
 }
 
 void MessageBox_main()
