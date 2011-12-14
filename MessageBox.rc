@@ -2,9 +2,9 @@
 
 #include <winver.h>
 
-#define VERNUM				1,00,0,0
-#define VERSTR				"1.00"
-#define CREDIT2009			"Copyright (c) 2009 by opa"
+#define VERNUM				1,01,0,0
+#define VERSTR				"1.01"
+#define CREDIT2009			"Copyright (c) 2009-2011 by opa"
 #define PGM					"MessageBox"
 #define DESCRIPTION			"Message Box"
 
@@ -38,4 +38,3 @@ BEGIN
 END
 
 1	ICON	"MessageBox.ico"
-

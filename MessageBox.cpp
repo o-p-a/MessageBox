@@ -14,9 +14,9 @@
 #define PGM_INFO			PGM ": "
 #define PGM_WARN			PGM " warning: "
 #define PGM_ERR				PGM " error: "
-#define VERSTR				"1.00"
+#define VERSTR				"1.01"
 
-#define CREDIT2009			"Copyright (c) 2009 by opa"
+#define CREDIT2009			"Copyright (c) 2009-2011 by opa"
 
 typedef signed char schar;
 typedef unsigned char uchar;
@@ -180,6 +180,19 @@ String &String::assign_from_utf8(const char *s)
 	return *this;
 }
 
+String &String::assign_from_env(const String &name)
+{
+	wchar_t
+		*g = _wgetenv(name.c_str());
+
+	if(g)
+		assign(g);
+	else
+		clear();
+
+	return *this;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 class WindowsAPI {
@@ -223,29 +236,40 @@ String get_given_option(const String &cmd)
 	return String();
 }
 
-void parse_arg()
+void parse_arg(sint ac, wchar_t *av[])
 {
 	String
-		cmdline(WindowsAPI::GetCommandLine()),
-		arg(get_given_option(cmdline).trim());
+		text,
+		caption;
 
-	message_text = arg;
-	message_caption = "メッセージ";
+	for(sint i = 1 ; i < ac ; ++i){
+		text += av[i];
+		text += " ";
+	}
+	text = text.trim();
+
+	caption.assign_from_env("PROGRAM_NAME");
+	caption = caption.trim();
+	if(caption.size() == 0)
+		caption = "メッセージ";
+
+	message_text = text;
+	message_caption = caption;
 	message_type = MB_APPLMODAL | MB_ICONINFORMATION | MB_TOPMOST;
 }
 
-void MessageBox_main()
+void MessageBox_main(sint ac, wchar_t *av[])
 {
-	parse_arg();
+	parse_arg(ac, av);
 
 	rcode = MessageBox(NULL, (message_text + "        ").c_str(), message_caption.c_str(), message_type);
 }
 
 #ifdef __CONSOLE__
 
-sint wmain(sint, wchar_t *[])
+sint wmain(sint ac, wchar_t *av[])
 {
-	MessageBox_main();
+	MessageBox_main(ac, av);
 
 	return rcode;
 }
@@ -261,14 +285,13 @@ void dummy_message()
 }
 
 extern "C"
-sint WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
+sint WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR av, int ac)
 {
 	dummy_message();
 
-	MessageBox_main();
+	MessageBox_main(ac, av);
 
 	return rcode;
 }
 
 #endif // __CONSOLE__
-
